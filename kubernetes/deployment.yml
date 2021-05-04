@@ -19,14 +19,65 @@ spec:
     spec:
       imagePullSecrets:
         - name: demo-registry-credentials-pull
+      automountServiceAccountToken: false
       containers:
         - name: cloud-sample-node-chat-demo-app
           image: europe-west3-docker.pkg.dev/sap-se-gcp-istio-dev/btp-core-demo/docker/cloud-sample-node-chat:latest
+          env:
+          - name: PORT
+            value: "8089"
+          - name: VCAP_APPLICATION
+            value: |
+             {
+              "process_id": 1,
+              "instance_id": 1,
+              "application_id": "891c515a-3e5a-4c5f-8ffe-e2852c437867",
+              "application_name": "cloud-sample-node-chat-demo-app"
+             }
+          resources:
+            limits:
+              memory: "1G"
+              ephemeral-storage: "256M"
+              cpu: "800m"
+            requests:
+              memory: "1G"
+              ephemeral-storage: "256M"
+              cpu: "100m"
+          livenessProbe:
+            httpGet:
+              port: 8089
+              path: /
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 60
+            successThreshold: 1
+            failureThreshold: 1
+          readinessProbe:
+            httpGet:
+              port: 8089
+              path: /
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            timeoutSeconds: 60
+            successThreshold: 1
+            failureThreshold: 1
           ports:
             - containerPort: 8089
           volumeMounts:
           - mountPath: /tmp
             name: tmp
+          securityContext:
+            #https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#securitycontext-v1-core
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            # issue with spring boot apps https://github.com/spring-projects/spring-boot/issues/8578   
+            readOnlyRootFilesystem: false
       volumes:
       - name: tmp
         emptyDir: {}
+      securityContext:
+        #https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#podsecuritycontext-v1-core
+        runAsNonRoot: true
