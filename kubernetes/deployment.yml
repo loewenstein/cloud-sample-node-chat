@@ -36,11 +36,11 @@ spec:
              }
           resources:
             limits:
-              memory: "1G"
+              memory: "128M"
               ephemeral-storage: "256M"
               cpu: "800m"
             requests:
-              memory: "1G"
+              memory: "128M"
               ephemeral-storage: "256M"
               cpu: "100m"
           livenessProbe:
