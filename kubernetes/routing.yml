@@ -37,3 +37,24 @@ spec:
       - HEAD
       accessStrategies:
         - handler: allow
+
+---
+# Source: cf-app/templates/app.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: cloud-sample-node-chat-demo-app
+spec:
+  podSelector:
+    matchLabels:
+      release: demo-app
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: istio-system
+      podSelector:
+        matchLabels:
+          app: istio-ingressgateway
