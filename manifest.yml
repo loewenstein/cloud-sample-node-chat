@@ -2,7 +2,8 @@
 applications:
 - name: cloud-sample-node-chat
   path: .
+  memory: 128M
   disk_quota: 256MB
-  instances: 2
+  instances: 1
   health-check-type: http
   buildpack: nodejs_buildpack
